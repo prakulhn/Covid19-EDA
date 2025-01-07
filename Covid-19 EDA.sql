@@ -1,9 +1,14 @@
---SELECT * FROM PortfolioProject..covid_deaths
---WHERE continent IS NOT NULL
---ORDER BY 3,4
+/*
+Covid 19 Data Exploration 
+Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+*/
 
---SELECT * FROM PortfolioProject..covid_vaccinations
---ORDER BY 3,4
+SELECT * FROM PortfolioProject..covid_deaths
+WHERE continent IS NOT NULL
+ORDER BY 3,4
+
+SELECT * FROM PortfolioProject..covid_vaccinations
+ORDER BY 3,4
 
 
 SELECT location, date, total_cases, new_cases, total_deaths, population
@@ -11,6 +16,9 @@ FROM PortfolioProject..covid_deaths
 WHERE continent IS NOT NULL
 ORDER BY 1,2
 
+
+-- Total Cases vs Total Deaths
+-- Shows likelihood of dying if you contract covid in your country
 
 SELECT location, date, total_cases, total_deaths,
 CASE
@@ -23,12 +31,17 @@ AND continent IS NOT NULL
 ORDER BY 1,2
 
 
-SELECT location, date, population, total_cases, (total_cases/population)*100 casesPercentage
+-- Total Cases vs Population
+-- Shows what percentage of population infected with Covid
+
+SELECT location, date, population, total_cases, (total_cases/population)*100 infectedPercentage
 FROM PortfolioProject..covid_deaths
 --WHERE location LIKE '%states%'
 WHERE continent IS NOT NULL
 ORDER BY 1,2
 
+
+-- Countries with Highest Infection Rate compared to Population
 
 SELECT location, population, MAX(total_cases) MaxCases, MAX((total_cases/population))*100 casesPercentage
 FROM PortfolioProject..covid_deaths
@@ -38,6 +51,8 @@ GROUP BY location, population
 ORDER BY casesPercentage DESC
 
 
+-- Countries with Highest Death Count per Population
+
 SELECT location, MAX(CAST(total_deaths AS INT)) MaxDeaths
 FROM PortfolioProject..covid_deaths
 --WHERE location LIKE '%states%'
@@ -45,6 +60,8 @@ WHERE continent IS NOT NULL
 GROUP BY location
 ORDER BY MaxDeaths DESC
 
+
+-- Showing contintents with the highest death count per population
 
 SELECT continent, MAX(CAST(total_deaths AS INT)) MaxDeaths
 FROM PortfolioProject..covid_deaths
@@ -61,6 +78,8 @@ WHERE continent IS NOT NULL
 GROUP BY continent, population
 ORDER BY deathPercentage DESC
 
+
+-- GLOBAL NUMBERS 
 
 SELECT date, SUM(new_cases) TotalNewCases, SUM(CAST(new_deaths AS INT)) TotalNewDeaths,
 CASE
@@ -85,6 +104,9 @@ WHERE continent IS NOT NULL
 --GROUP BY date
 ORDER BY 1,2
 
+
+-- Total Population vs Vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
 SUM(CAST(vac.new_vaccinations AS BIGINT)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) 
